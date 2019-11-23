@@ -1,8 +1,7 @@
-const fs = require("fs");
-const path = require("path");
-const Sequelize = require("sequelize");
-const basename = path.basename(__filename);
-const db = {};
+const fs = require('fs');
+const path = require('path');
+const Sequelize = require('sequelize');
+const models = {};
 
 const sequelize = new Sequelize(process.env.DBNAME, process.env.DBUSER, process.env.DBPASSWORD, {
   host: process.env.DBHOST,
@@ -10,29 +9,21 @@ const sequelize = new Sequelize(process.env.DBNAME, process.env.DBUSER, process.
   pool: {
     max: 5,
     min: 0,
-    idle: 10000
+    idle: 10000,
   },
 });
 
-fs
-.readdirSync(__dirname)
-.filter((file) => {
-  return (file.indexOf(".") !== 0) &&
-      (file !== basename) &&
-      (file.slice(-3) === ".js");
-})
-.forEach((file) => {
-  const model = sequelize["import"](path.join(__dirname, file));
-  db[model.name] = model;
+fs.readdirSync(__dirname).filter(file => file.indexOf('.') !== 0 && file !== 'index.js').forEach(file => {
+  const model = require(path.join(__dirname, file)).default;
+  models[model.name] = model.init(sequelize, Sequelize);
 });
 
-Object.keys(db).forEach((modelName) => {
-  if (db[modelName].associate) {
-    db[modelName].associate(db);
+// create associations between models
+Object.keys(models).forEach(name => {
+  if (typeof models[name].associate === 'function') {
+    models[name].associate(models);
   }
 });
 
-db.sequelize = sequelize;
-db.Sequelize = Sequelize;
-
-module.exports = db;
+models.sequelize = sequelize;
+module.exports = models;

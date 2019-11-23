@@ -1,10 +1,9 @@
 // const handleSignUp = require('../../controllers/handleSignUp');
-const User = require('../../models/user');
-const db = require('../../models');
+const {db, User} = require('../../models');
 
 export default (req, res) => {
   User.create({
-    firstname: 'james',
+    username: 'james',
     password: "shit",
   })
       .then(() => {
