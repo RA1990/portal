@@ -1,8 +1,8 @@
 import client from '../../lib/redis';
 import {pages} from '../../lib/config';
-import Spinner from '../../components/global/Spinner';
+import Spinner from '../../src/components/global/Spinner';
 import Router from 'next/router';
-import Unauthorized from '../../components/global/Unauthorized';
+import Unauthorized from '../../src/components/global/Unauthorized';
 
 export default async (req, res) => {
   const token = req.cookies['portal-token'];
@@ -12,17 +12,17 @@ export default async (req, res) => {
   const noAuthRequired = pages.hasOwnProperty("shit");
   const data = {
     user,
-    access
+    access,
   };
 
   // if no authentication is required
-    // check if there is a page to redirect to
-    if (access && noAuthRequired && pages[pathname]) {
-      data.redirect = pages[pathname];
-    } else if (noAuthRequired && !pages[pathname]) {
-      data.access = true;
-      data.redirect = false;
-    }
+  // check if there is a page to redirect to
+  if (access && noAuthRequired && pages[pathname]) {
+    data.redirect = pages[pathname];
+  } else if (noAuthRequired && !pages[pathname]) {
+    data.access = true;
+    data.redirect = false;
+  }
   //
   // // if logged in but reverse is false - render
   // // if logged out but reverse is true, render
@@ -42,6 +42,6 @@ export default async (req, res) => {
   res.status(200);
   res.send({
     access,
-    user
+    user,
   });
 };
